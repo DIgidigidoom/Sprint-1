@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>Document</title>
+    <title>Mines Sweeper</title>
 </head>
 
 <body onload="onInit()">
@@ -13,13 +13,16 @@
 
 
     <div class="game-interface">
-        <h1 class ="scoreboard">SCORE : <span></span></h1>
+        
+        <button class="restart-button" onclick="onInit()">😀</button>
 
         <table>
             <tbody class="board">
 
             </tbody>
         </table>
+        <h1 class ="scoreboard">LIVES : <span></span></h1>
+        <h1 class ='lightbulb-hint'></h1>
     </div>
 
 

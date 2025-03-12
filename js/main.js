@@ -5,19 +5,22 @@ var gMine = '💣'
 var gNumOfMines = 2
 var isFirstClick = true
 var gLives = 3
-
-
-
+var gGmaeOverInterval
+var gLightbulbs 
 
 
 
 function onInit() {
-
+    gLightbulbs = []
+    isFirstClick = true
+    gLives = 3
     gBoard = buildBoard()
     renderBoard(gBoard)
+    lightbulbHint()
     updateScore()
-    disableRightClickMenu()
+    restartButtonStatus('happy')
     console.log(gBoard)
+
 }
 
 function buildBoard() {
@@ -44,8 +47,9 @@ function renderBoard(board) {
         strHTML += '<tr>'
         for (var j = 0; j < board.length; j++) {
             const currCell = board[i][j]
-            const cellClass = currCell.isCovered ? 'hidden' : ''
-            strHTML += `<td class="cell ${cellClass}" data-i="${i}" data-j="${j}" onclick="onCellClicked(event,this,${i},${j})">`
+            const cellCoverClass = currCell.isCovered ? 'hidden' : ''
+            const cellMarkedClass = currCell.isMarked ? 'marked' : ''
+            strHTML += `<td class="cell ${cellCoverClass} ${cellMarkedClass}" data-i="${i}" data-j="${j}" onclick="onCellClicked(event,this,${i},${j})">`
             if (currCell.isMine === true) {
                 strHTML += `<span>${gMine}</span>`
 
@@ -60,6 +64,7 @@ function renderBoard(board) {
 
     const elBoard = document.querySelector('.board')
     elBoard.innerHTML = strHTML
+    disableRightClickMenu()
 }
 
 function setMinesNegsCount(cellI, cellJ, mat) {
@@ -74,31 +79,40 @@ function setMinesNegsCount(cellI, cellJ, mat) {
     }
     return negsCount
 }
+function expandReveal(cellI, cellJ, mat) {
+    if (mat[cellI][cellJ].isMine) return
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= mat.length) continue
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j >= mat[i].length) continue
+            if (mat[i][j].isMine !== true) {
+                gBoard[i][j].isCovered = false
+            }
+        }
+    }
+}
 
 function onCellClicked(ev, elCell, i, j) {
     console.log(ev)
     if (isFirstClick === true) {
         placeMines(gBoard, gNumOfMines, i, j)
-        renderBoard(gBoard)
-        disableRightClickMenu()
         isFirstClick = false
     }
-    //MODEL
-    gBoard[i][j].isCovered = false
-    //FIXME: wornt remove hidden class on first click
-    //DOM/
-    elCell.classList.remove('hidden')
-    elCell.classList.remove('marked')
-    //console.log(elCell)
-    checkIfMine(ev, elCell, i, j)
+
+    expandReveal(i, j, gBoard)
+    checkIfMine(i, j)
+    renderBoard(gBoard)
+    checkGameOver()
 }
 
 function rightClick(ev) {
     const i = ev.target.getAttribute('data-i');
     const j = ev.target.getAttribute('data-j');
     if (gBoard[i][j].isCovered === true) {
-        ev.target.classList.toggle('marked')
+        gBoard[i][j].isMarked = !gBoard[i][j].isMarked
     }
+    renderBoard(gBoard)
+    console.log(gBoard)
 }
 
 function placeMines(board, numOfMines, i, j) {
@@ -112,29 +126,80 @@ function placeMines(board, numOfMines, i, j) {
 
 }
 
-function checkIfMine(ev, elCell, i, j) {
+function checkIfMine(i, j) {
     if (gBoard[i][j].isMine === true) {
+        gBoard[i][j].isCovered = false
         gLives--
         updateScore()
+        restartButtonStatus('boom')
         alert('Thats A Mine!')
+    } else {
+        restartButtonStatus('happy')
     }
+
 }
 
 function updateScore() {
     var elScore = document.querySelector('.scoreboard span')
     elScore.innerHTML = gLives
+    checkGameOver()
+}
+function restartButtonStatus(status) {
+    var elbtn = document.querySelector('.restart-button')
+    switch (status) {
+        case 'happy':
+            elbtn.innerHTML = '😀'
+            break
+        case 'boom':
+            elbtn.innerHTML = '💥'
+            break
+        case 'cool':
+            elbtn.innerHTML = '😎'
+            break
+        case 'lost':
+            elbtn.innerHTML = '😭'
+            break
+    }
+
 }
 
-// TODO: function onCellMarked(elCell) {
+function checkGameOver() {
+    //debugger
+    if (gLives === 0) {
+        restartButtonStatus('lost')
+    } else {
+        for (var i = 0; i < gBoard.length; i++) {
+            for (var j = 0; j < gBoard.length; j++) {
+                if (gBoard[i][j].isCovered === true && gBoard[i][j].isMine === false) return
 
-// }
+            }
 
-// TODO:function checkGameOver(){
+        }
+        restartButtonStatus('cool')
+    }
 
-// }
+}
 
-// TODO:function expandReveal(board, elCell, i, j) {
+function lightbulbHint() {
 
+    for (var i = 0; i < 3; i++) {
+        gLightbulbs[i] = {
+            isOn: true
+        }
+        renderLightbulbs(i)
+    }
+}
+
+function renderLightbulbs(i) {
+    var ellightbulb = document.querySelector('.lightbulb-hint')
+    const strHTML = gLightbulbs[i].isOn ? '💡' : ''
+    //var strHTML = '💡'
+    ellightbulb.innerHTML += `<span onclick="isLightbulb(${i})" data-i="${i}">${strHTML}</span>`
+}
+
+// function isLightbulb(i){
+//     var elhintActive = document.
+    
 // }
 
 function disableRightClickMenu() {

@@ -1,15 +1,42 @@
+
+html{
+    background-color: lightcyan;
+}
+
 .game-interface {
     background-color: lightcyan;
     width: 100%;
-    height: 100vh;
-    display: flex;
-    /* justify-content: center; */
-    
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+
 }
-.scoreboard{
+
+.scoreboard {
     display: block;
     text-align: center;
     font-size: 40px;
+    margin: 30px auto;
+}
+.lightbulb-hint{
+    text-align: center;
+    cursor : pointer;
+}
+
+.restart-button {
+    display: block;
+    font-size: 60px;
+    width: 50px;
+    height: 50px;
+    margin: auto;
+    border-radius: 50%;
+    height: fit-content;
+    width: fit-content;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    margin: 30px auto;
 }
 
 table {
@@ -17,13 +44,16 @@ table {
     border: 1px solid black;
     border-collapse: separate;
     background-color: lightskyblue;
-    margin: auto;
+    margin: 30px auto;
     display: block;
-    
-    
+    height: fit-content;
+    width: fit-content;
+
+
+
 }
 
-.cell{
+.cell {
 
     width: 80px;
     height: 80px;
@@ -31,15 +61,26 @@ table {
     transition: 0.5s;
     border: 1px solid black;
     cursor: pointer;
-    
+    background-color: rgba(135, 206, 250, 0.257);
+
 }
-.hidden span{
+
+.hidden span {
     visibility: hidden;
 }
-.marked{
+
+.cell :hover {
+    transition: 0.5s;
+    background-color: rgba(135, 206, 250, 0.257);
+}
+
+.marked {
+    transition: 1s;
     background-color: brown;
 }
-footer{
+
+footer {
+    margin: 500px auto;
     text-align: center;
     font-size: 40px;
 }
