@@ -3,6 +3,8 @@ var gBoard = []
 var gMatSize = 4
 var gMine = '💣'
 var gNumOfMines = 2
+var isFirstClick = true
+var gLives = 3
 
 
 
@@ -10,9 +12,11 @@ var gNumOfMines = 2
 
 
 function onInit() {
+
     gBoard = buildBoard()
     renderBoard(gBoard)
-    setMinesNegsCount(gBoard)
+    updateScore()
+    disableRightClickMenu()
     console.log(gBoard)
 }
 
@@ -29,10 +33,7 @@ function buildBoard() {
         }
     }
     //placeMines(board, gNumOfMines)
-    board[0][1].isMine = true
-    board[0][2].isMine = true
 
-    
     return board
 }
 
@@ -44,17 +45,7 @@ function renderBoard(board) {
         for (var j = 0; j < board.length; j++) {
             const currCell = board[i][j]
             const cellClass = currCell.isCovered ? 'hidden' : ''
-
-            //     if (currCell.isMine === true) {
-            //         strHTML += `<td class="cell ${cellClass}" data-i="${i}" data-j="${j}"><span>${gMine}</span>
-            //     </td>`
-            //     } else {
-            //         currCell.minesAroundCount = setMinesNegsCount(i, j, board)
-            //         strHTML += `<td class="cell ${cellClass}" data-i="${i}" data-j="${j}"> 
-            //         <span>${currCell.minesAroundCount}</span>
-            //         </td>`
-            //     }
-            strHTML += `<td class="cell ${cellClass}" data-i="${i}" data-j="${j}" onclick="onCellClicked(this,${i},${j})">`
+            strHTML += `<td class="cell ${cellClass}" data-i="${i}" data-j="${j}" onclick="onCellClicked(event,this,${i},${j})">`
             if (currCell.isMine === true) {
                 strHTML += `<span>${gMine}</span>`
 
@@ -84,24 +75,54 @@ function setMinesNegsCount(cellI, cellJ, mat) {
     return negsCount
 }
 
-function onCellClicked(elCell, i, j) {
-
+function onCellClicked(ev, elCell, i, j) {
+    console.log(ev)
+    if (isFirstClick === true) {
+        placeMines(gBoard, gNumOfMines, i, j)
+        renderBoard(gBoard)
+        disableRightClickMenu()
+        isFirstClick = false
+    }
     //MODEL
     gBoard[i][j].isCovered = false
-
-    //DOM
+    //FIXME: wornt remove hidden class on first click
+    //DOM/
     elCell.classList.remove('hidden')
-    console.log(elCell)
+    elCell.classList.remove('marked')
+    //console.log(elCell)
+    checkIfMine(ev, elCell, i, j)
+}
 
+function rightClick(ev) {
+    const i = ev.target.getAttribute('data-i');
+    const j = ev.target.getAttribute('data-j');
+    if (gBoard[i][j].isCovered === true) {
+        ev.target.classList.toggle('marked')
+    }
+}
+
+function placeMines(board, numOfMines, i, j) {
+    for (var index = 0; index < numOfMines;) {
+        var emptyPos = findEmptyPos(board)
+        if (emptyPos.i === i && emptyPos.j === j) continue
+
+        board[emptyPos.i][emptyPos.j].isMine = true
+        index++
+    }
 
 }
 
-function placeMines(board, numOfMines) {
-    for (var index = 0; index < numOfMines; index++) {
-        var emptyPos = findEmptyPos(board)
-        board[emptyPos.i][emptyPos.j].isMine = true
+function checkIfMine(ev, elCell, i, j) {
+    if (gBoard[i][j].isMine === true) {
+        gLives--
+        updateScore()
+        alert('Thats A Mine!')
     }
+}
 
+function updateScore() {
+    var elScore = document.querySelector('.scoreboard span')
+    elScore.innerHTML = gLives
 }
 
 // TODO: function onCellMarked(elCell) {
@@ -115,3 +136,16 @@ function placeMines(board, numOfMines) {
 // TODO:function expandReveal(board, elCell, i, j) {
 
 // }
+
+function disableRightClickMenu() {
+    const cells = document.querySelectorAll('.cell');
+
+    // Add event listener for the contextmenu (right-click) event
+    cells.forEach(cell => {
+        cell.addEventListener('contextmenu', function (event) {
+            event.preventDefault();
+            rightClick(event)
+            console.log('Right-click disabled on a cell!');
+        });
+    });
+}

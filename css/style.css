@@ -6,6 +6,11 @@
     /* justify-content: center; */
     
 }
+.scoreboard{
+    display: block;
+    text-align: center;
+    font-size: 40px;
+}
 
 table {
     padding: 10px;
@@ -13,6 +18,7 @@ table {
     border-collapse: separate;
     background-color: lightskyblue;
     margin: auto;
+    display: block;
     
     
 }
@@ -29,6 +35,9 @@ table {
 }
 .hidden span{
     visibility: hidden;
+}
+.marked{
+    background-color: brown;
 }
 footer{
     text-align: center;
