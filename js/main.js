@@ -6,11 +6,19 @@ var gNumOfMines = 2
 var isFirstClick = true
 var gLives = 3
 var gGmaeOverInterval
-var gLightbulbs 
+var gHintOnInterval
+var gLightbulbs
+var gLightbulbChosen = false
+var gTimer
+var gTime = 0
+
 
 
 
 function onInit() {
+    document.querySelectorAll('.lightbulb-hint button').forEach(element => {
+        element.className = '';
+    });
     gLightbulbs = []
     isFirstClick = true
     gLives = 3
@@ -19,6 +27,10 @@ function onInit() {
     lightbulbHint()
     updateScore()
     restartButtonStatus('happy')
+    clearInterval(gTimer)
+    tableInteraction(false)
+
+    timer()
     console.log(gBoard)
 
 }
@@ -93,16 +105,21 @@ function expandReveal(cellI, cellJ, mat) {
 }
 
 function onCellClicked(ev, elCell, i, j) {
-    console.log(ev)
-    if (isFirstClick === true) {
-        placeMines(gBoard, gNumOfMines, i, j)
+    //debugger  
+    if (gLightbulbChosen) {
+        checkFirstClick(i, j)
+        renderBoard(gBoard)
+        lightbulbIsOn(i, j, gBoard)
         isFirstClick = false
-    }
+        gLightbulbChosen = false
+    } else {
+        checkFirstClick(i, j)
 
-    expandReveal(i, j, gBoard)
-    checkIfMine(i, j)
-    renderBoard(gBoard)
-    checkGameOver()
+        expandReveal(i, j, gBoard)
+        checkIfMine(i, j)
+        renderBoard(gBoard)
+        checkGameOver()
+    }
 }
 
 function rightClick(ev) {
@@ -113,6 +130,12 @@ function rightClick(ev) {
     }
     renderBoard(gBoard)
     console.log(gBoard)
+}
+function checkFirstClick(i, j) {
+    if (isFirstClick === true) {
+        placeMines(gBoard, gNumOfMines, i, j)
+        isFirstClick = false
+    }
 }
 
 function placeMines(board, numOfMines, i, j) {
@@ -132,7 +155,6 @@ function checkIfMine(i, j) {
         gLives--
         updateScore()
         restartButtonStatus('boom')
-        alert('Thats A Mine!')
     } else {
         restartButtonStatus('happy')
     }
@@ -167,6 +189,9 @@ function checkGameOver() {
     //debugger
     if (gLives === 0) {
         restartButtonStatus('lost')
+        revealAll()
+        clearInterval(gTimer)
+        tableInteraction(true)
     } else {
         for (var i = 0; i < gBoard.length; i++) {
             for (var j = 0; j < gBoard.length; j++) {
@@ -176,6 +201,10 @@ function checkGameOver() {
 
         }
         restartButtonStatus('cool')
+        clearInterval(gTimer)
+        revealAll()
+        tableInteraction(true)
+        storeScore()
     }
 
 }
@@ -184,23 +213,112 @@ function lightbulbHint() {
 
     for (var i = 0; i < 3; i++) {
         gLightbulbs[i] = {
-            isOn: true
+            isOn: true,
+            isChosen: false
         }
-        renderLightbulbs(i)
+
     }
 }
 
-function renderLightbulbs(i) {
-    var ellightbulb = document.querySelector('.lightbulb-hint')
-    const strHTML = gLightbulbs[i].isOn ? '💡' : ''
-    //var strHTML = '💡'
-    ellightbulb.innerHTML += `<span onclick="isLightbulb(${i})" data-i="${i}">${strHTML}</span>`
+
+function isLightbulb(i, elIsLbOn) {
+    gLightbulbs[i].isChosen = !gLightbulbs[i].isChosen
+    if (!gLightbulbs[i].isChosen) {
+        elIsLbOn.classList.remove('chosen')
+    } else {
+        elIsLbOn.classList.add('chosen')
+    }
+    gLightbulbChosen = !gLightbulbChosen
+
 }
 
-// function isLightbulb(i){
-//     var elhintActive = document.
-    
+function lightbulbIsOn(cellI, cellJ, mat) {
+    var elBulb = document.querySelector(`.lightbulb-hint .chosen`)
+    console.log(elBulb)
+    elBulb.classList.add('isOn')
+    revealLbHint(cellI, cellJ, mat)
+    gHintOnInterval = setTimeout(function () {
+        hideLbHint(cellI, cellJ, mat);
+    }, 2500);
+
+}
+
+function revealLbHint(cellI, cellJ, mat) {
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= mat.length) continue
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j >= mat[i].length) continue
+            if (gBoard[i][j].isCovered === true) {
+                //debugger
+                var elCell = document.querySelector(`.cell[data-i="${i}"][data-j="${j}"]`)
+                console.log(elCell)
+                elCell.classList.remove('hidden')
+            }
+
+        }
+    }
+
+}
+function hideLbHint(cellI, cellJ, mat) {
+    for (var i = cellI - 1; i <= cellI + 1; i++) {
+        if (i < 0 || i >= mat.length) continue
+        for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+            if (j < 0 || j >= mat[i].length) continue
+            if (gBoard[i][j].isCovered === true) {
+                var elCell = document.querySelector(`.cell[data-i="${i}"][data-j="${j}"]`)
+                elCell.classList.add('hidden')
+            }
+        }
+    }
+    clearInterval(gHintOnInterval)
+}
+function revealAll() {
+
+    var elAllCellsOnTable = document.querySelectorAll('.cell.hidden')
+    console.log(elAllCellsOnTable)
+    elAllCellsOnTable.forEach(function (el) {
+        el.classList.remove('hidden');
+    });
+}
+
+function timer() {
+
+    gTimer = setInterval(function () {
+        gTime += 0.01;
+        document.querySelector('.time').textContent = gTime.toFixed(2)
+
+    }, 10);
+}
+function tableInteraction(condition) {
+    if (condition) {
+        var ellboard = document.querySelector('.interactive')
+        ellboard.classList.add('non-interactive')
+
+    } else {
+        var ellboard = document.querySelector('.interactive')
+        ellboard.classList.remove('non-interactive')
+
+    }
+}
+//TODO: Render cells for ascoreboard, currently replaces best score eachtime
+// function storeScore() {
+//     if (typeof (Storage) !== "undefined") {
+//         // Store
+//         var playerName = prompt('Enter your Name :')
+//         localStorage.setItem("playername", playerName);
+//         localStorage.setItem("score", gTime.toFixed(2));
+
+//         // Retrieve
+//         // document.getElementById("storage").innerHTML = localStorage.getItem("playername");
+//         var elPlayerName = document.querySelector('.player-name')
+//         elPlayerName.innerHTML += localStorage.getItem("playername");
+//         var elPlayerName = document.querySelector('.player-score')
+//         elPlayerName.innerHTML += localStorage.getItem("score");
+//     } else {
+//         document.getElementById("storage").innerHTML = "Sorry, your browser does not support Web Storage...";
+//     }
 // }
+
 
 function disableRightClickMenu() {
     const cells = document.querySelectorAll('.cell');

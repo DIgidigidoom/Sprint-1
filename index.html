@@ -13,16 +13,25 @@
 
 
     <div class="game-interface">
-        
+        <div class="basketball-timer">
+            <div class="timer-circle">
+                <div class="time" id="time">00:00</div>
+            </div>
+        </div>
         <button class="restart-button" onclick="onInit()">😀</button>
-
+        <span class ="interactive">
         <table>
             <tbody class="board">
 
             </tbody>
         </table>
         <h1 class ="scoreboard">LIVES : <span></span></h1>
-        <h1 class ='lightbulb-hint'></h1>
+        <h1 class ='lightbulb-hint'>
+            <button onclick="isLightbulb(0,this)" data-i="0">💡</button> 
+            <button onclick="isLightbulb(1,this)" data-i="1">💡</button> 
+            <button onclick="isLightbulb(2,this)" data-i="2">💡</button> 
+        </h1>
+    </span>
     </div>
 
 
@@ -30,6 +39,15 @@
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
 </body>
+<div id="storage"></div>
+<table>
+    <tbody class ="board">
+<tr>
+    <td class="player-name">0</td>
+    <td class ="player-score">0</td>
+</tr>
+    </tbody>
+</table>
 <footer>Tom Shahar</footer>
 
 </html>

@@ -1,5 +1,4 @@
-
-html{
+html {
     background-color: lightcyan;
 }
 
@@ -19,9 +18,60 @@ html{
     font-size: 40px;
     margin: 30px auto;
 }
-.lightbulb-hint{
+
+.lightbulb-hint {
+    margin: auto;
+    height: fit-content;
+    width: fit-content;
+
+}
+
+.lightbulb-hint button {
+    margin: 40px;
+    height: fit-content;
+    width: fit-content;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    font-size: 50px;
+}
+
+.basketball-timer {
+    position: left;
+    width: 150px;
+    height: 150px;
+    background-color: #f8a101;
+    border-radius: 50%;
+    border: 10px solid #000;
+    display: flex;
+    /* flex-direction: column; */
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    margin-top: 5%;
+    margin-left: 80%
+}
+
+.timer-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+
+.time {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #111;
     text-align: center;
-    cursor : pointer;
+    text-transform: uppercase;
+    letter-spacing: 3px;
 }
 
 .restart-button {
@@ -62,20 +112,37 @@ table {
     border: 1px solid black;
     cursor: pointer;
     background-color: rgba(135, 206, 250, 0.257);
+    transition: 0.1s;
 
 }
 
-.hidden span {
+
+.board .hidden span {
     visibility: hidden;
+    /* transition: 1s; */
 }
 
-.cell :hover {
-    transition: 0.5s;
-    background-color: rgba(135, 206, 250, 0.257);
+
+.lightbulb-hint .chosen {
+    background-color: yellow;
+}
+
+.lightbulb-hint .isOn {
+    display: none;
+}
+
+.non-interactive {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.cell:hover {
+    transform: scale(1.1);
+    transition:transform 0.1s;
 }
 
 .marked {
-    transition: 1s;
+    transition: 0.1s;
     background-color: brown;
 }
 
